@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 public class GameActivity extends Activity {
     public static final String KEY_RESTORE = "key_restore";
@@ -55,5 +56,15 @@ public class GameActivity extends Activity {
         dialog.show();
 
         mGameFragment.initGame();
+    }
+
+    public void startThinking() {
+        View thinkView = findViewById(R.id.thinking);
+        thinkView.setVisibility(View.VISIBLE);
+    }
+
+    public void stopThinking() {
+        View thinkView = findViewById(R.id.thinking);
+        thinkView.setVisibility(View.GONE);
     }
 }

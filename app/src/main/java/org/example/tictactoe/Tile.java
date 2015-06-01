@@ -40,7 +40,7 @@ public class Tile {
         this.mOwner = owner;
     }
 
-    public Tile[] getmSubTiles(){
+    public Tile[] getSubTiles(){
         return mSubTiles;
     }
 
@@ -149,5 +149,42 @@ public class Tile {
         }
         totalX[capturedX]++;
         totalO[capturedO]++;
+    }
+
+    public int evaluate() {
+        switch(getOwner()) {
+            case X:
+                return 100;
+            case O:
+                return -100;
+            case NEITHER:
+                int total = 0;
+                if (getSubTiles() != null) {
+                    for (int tile = 0; tile < 9; tile++) {
+                        total += getSubTiles()[tile].evaluate();
+                    }
+
+                    int totalX[] = new int[4];
+                    int totalO[] = new int[4];
+                    countCaptures(totalX, totalO);
+                    total = total * 100 + totalX[1] + 2 * totalX[2] + 8 * totalX[3] - totalO[1] - 2 * totalO[2] - 8 * totalO[3];
+                }
+                return total;
+        }
+        return 0;
+    }
+
+    public Tile deepCopy() {
+        Tile tile = new Tile(mGame);
+        tile.setOwner(getOwner());
+        if (getSubTiles() != null) {
+            Tile newTiles[] = new Tile[9];
+            Tile oldTiles[] = getSubTiles();
+            for (int child = 0; child < 9; child++) {
+                newTiles[child] = oldTiles[child].deepCopy();
+            }
+            tile.setSubTiles(newTiles);
+        }
+        return tile;
     }
 }
