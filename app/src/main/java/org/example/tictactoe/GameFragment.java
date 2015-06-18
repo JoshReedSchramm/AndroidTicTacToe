@@ -1,6 +1,8 @@
 package org.example.tictactoe;
 
 import android.app.Fragment;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -15,6 +17,10 @@ import java.util.Set;
 public class GameFragment extends Fragment {
     static private int mLargeIds[] = {R.id.large1, R.id.large2, R.id.large3, R.id.large4, R.id.large5, R.id.large6, R.id.large7, R.id.large8, R.id.large9};
     static private int mSmallIds[] = {R.id.small1, R.id.small2, R.id.small3, R.id.small4, R.id.small5, R.id.small6, R.id.small7, R.id.small8, R.id.small9};
+
+    private int mSoundX, mSoundO, mSoundMiss, mSoundRewind;
+    private SoundPool mSoundPool;
+    private float mVolume = 1f;
 
     private Handler mHandler = new Handler();
 
@@ -33,6 +39,11 @@ public class GameFragment extends Fragment {
         // Retain this fragment across config changes
         setRetainInstance(true);
         initGame();
+        mSoundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+        mSoundX = mSoundPool.load(getActivity(), R.raw.sergenious_movex, 1);
+        mSoundO = mSoundPool.load(getActivity(), R.raw.sergenious_moveo, 1);
+        mSoundMiss = mSoundPool.load(getActivity(), R.raw.erkanozan_miss, 1);
+        mSoundRewind = mSoundPool.load(getActivity(), R.raw.joanne_rewind, 1);
     }
 
     @Override
@@ -76,9 +87,13 @@ public class GameFragment extends Fragment {
                 inner.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View view) {
+                        smallTile.animate();
                         if (isAvailable(smallTile)) {
+                            mSoundPool.play(mSoundX, mVolume, mVolume, 1, 0, 1f);
                             makeMove(fLarge, fSmall);
                             think();
+                        } else {
+                            mSoundPool.play(mSoundMiss, mVolume, mVolume, 1, 0, 1f);
                         }
                     }
                 });
@@ -98,6 +113,7 @@ public class GameFragment extends Fragment {
                     pickMove(move);
                     if (move[0] != -1 && move[1] != -1) {
                         switchTurns();
+                        mSoundPool.play(mSoundO, mVolume, mVolume, 1, 0, 1f);
                         makeMove(move[0], move[1]);
                         switchTurns();
                     }
@@ -144,6 +160,7 @@ public class GameFragment extends Fragment {
         Tile.Owner oldWinner = largeTile.getOwner();
         Tile.Owner winner = largeTile.findWinner();
         if (winner != oldWinner) {
+            largeTile.animate();
             largeTile.setOwner(winner);
         }
         winner = mEntireBoard.findWinner();
@@ -169,6 +186,7 @@ public class GameFragment extends Fragment {
     }
 
     private void addAvailable(Tile tile) {
+        tile.animate();
         mAvailable.add(tile);
     }
 
@@ -239,6 +257,4 @@ public class GameFragment extends Fragment {
             }
         }
     }
-
-
 }
